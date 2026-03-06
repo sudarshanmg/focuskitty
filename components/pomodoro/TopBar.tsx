@@ -13,15 +13,28 @@ export function TopBar() {
 
   return (
     <>
-      <div className="flex items-center justify-between px-5 pt-5 pb-4">
+      <div
+        className="flex items-center justify-between"
+        style={{
+          padding:
+            "clamp(0.75rem, 2.5vw, 1.25rem) clamp(0.75rem, 3vw, 1.25rem)",
+          gap: 6,
+        }}
+      >
         <span
-          className="font-semibold tracking-tighter"
-          style={{ fontSize: "0.92rem", color: "var(--text-primary)" }}
+          className="font-semibold tracking-tighter flex-shrink-0"
+          style={{
+            fontSize: "clamp(0.78rem, 2.5vw, 0.92rem)",
+            color: "var(--text-primary)",
+          }}
         >
           focuskitty.
         </span>
 
-        <div className="flex items-center gap-2">
+        <div
+          className="flex items-center"
+          style={{ gap: "clamp(4px, 1.5vw, 8px)" }}
+        >
           <ViewModePicker />
 
           <Tooltip content="Settings">
@@ -30,8 +43,9 @@ export function TopBar() {
               size="icon"
               onClick={openSettings}
               aria-label="Settings"
+              className="h-8 w-8"
             >
-              <Settings size={14} />
+              <Settings size={13} />
             </Button>
           </Tooltip>
 
@@ -40,10 +54,15 @@ export function TopBar() {
           <Button
             variant="ghost"
             size="sm"
-            className="gap-1 text-xs font-semibold border border-[var(--accent-ring)]"
+            className="gap-1 font-semibold border border-[var(--accent-ring)] flex-shrink-0"
+            style={{
+              fontSize: "clamp(0.65rem, 2vw, 0.75rem)",
+              padding: "0.3rem clamp(0.4rem, 1.5vw, 0.75rem)",
+              height: "auto",
+            }}
             onClick={openPaywall}
           >
-            <span style={{ fontSize: 9 }}>✦</span>
+            <span style={{ fontSize: 8 }}>✦</span>
             Plus
           </Button>
         </div>
