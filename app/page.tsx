@@ -150,7 +150,7 @@ function PreviewZen() {
         fill="var(--text-primary)"
         opacity="0.4"
       />
-      {/* 3 session dots — middle one is current/accent */}
+      {/* 3 session dots - middle one is current/accent */}
       <circle cx="20" cy="31" r="1.2" fill="var(--progress-track)" />
       <circle cx="24" cy="31" r="1.2" fill="var(--accent)" />
       <circle cx="28" cy="31" r="1.2" fill="var(--progress-track)" />
@@ -158,7 +158,7 @@ function PreviewZen() {
   );
 }
 function PreviewCompact() {
-  // pill: x=6..42, cy=24.5 — ring left, label center, play button right with padding
+  // pill: x=6..42, cy=24.5 - ring left, label center, play button right with padding
   return (
     <svg viewBox="0 0 48 36" fill="none" width="100%" height="100%">
       <rect width="48" height="36" rx="3" fill="var(--bg)" opacity="0.3" />
@@ -212,7 +212,7 @@ function PreviewCompact() {
         fill="var(--text-muted)"
         opacity="0.3"
       />
-      {/* play button — inset from right edge */}
+      {/* play button - inset from right edge */}
       <circle cx="37" cy="24.5" r="3.5" fill="var(--accent)" />
       <polygon
         points="36.1,23.1 36.1,25.9 39,24.5"
@@ -514,12 +514,12 @@ const VIEW_MODES = [
   },
   {
     label: "Zen",
-    desc: "Distraction-free overlay — just the timer and controls",
+    desc: "Distraction-free overlay - just the timer and controls",
     preview: <PreviewZen />,
   },
   {
     label: "Compact",
-    desc: "Draggable floating pill — stays visible while you work",
+    desc: "Draggable floating pill - stays visible while you work",
     preview: <PreviewCompact />,
   },
   {
@@ -529,7 +529,7 @@ const VIEW_MODES = [
   },
   {
     label: "Minimal",
-    desc: "Pure typography — giant countdown, nothing else",
+    desc: "Pure typography - giant countdown, nothing else",
     preview: <PreviewMinimal />,
   },
 ];
@@ -538,12 +538,12 @@ const FEATURES = [
   {
     icon: Timer,
     title: "5 View Modes",
-    desc: "Default, Zen, Compact, Analog, Minimal — switch instantly or use keyboard shortcuts.",
+    desc: "Default, Zen, Compact, Analog, Minimal - switch instantly or use keyboard shortcuts.",
   },
   {
     icon: Palette,
     title: "5 Themes",
-    desc: "Chalk, Midnight, Sage, Rose, Obsidian — crafted to reduce visual fatigue.",
+    desc: "Chalk, Midnight, Sage, Rose, Obsidian - crafted to reduce visual fatigue.",
   },
   {
     icon: Keyboard,
@@ -606,17 +606,17 @@ export default function LandingPage() {
           <Sparkles size={11} /> Minimal Pomodoro Timer
         </div>
         <h1 className="hero__h1">
-          Your focus,
+          Focus made
           <br />
-          <span className="accent">finally.</span>
+          <span className="accent">aesthetic.</span>
         </h1>
         <p className="hero__sub">
-          A beautifully minimal timer built around the Pomodoro Technique. Five
-          view modes, five themes, zero distractions.
+          A beautifully distilled Pomodoro experience. Choose your theme, set
+          your mode, and let everything else fade away.
         </p>
         <div className="hero__ctas">
           <a href="/app" className="btn-accent btn-lg">
-            Start focusing — it&apos;s free
+            Start focusing - it&apos;s free
           </a>
           <a href="#how-it-works" className="btn-ghost btn-lg">
             How it works ↓
@@ -735,7 +735,7 @@ export default function LandingPage() {
               <div className="two-col__text">
                 <p className="body-text">
                   The Pomodoro Technique was developed by Francesco Cirillo in
-                  the late 1980s. The idea is simple — work in focused sprints,
+                  the late 1980s. The idea is simple - work in focused sprints,
                   separated by short rests.
                 </p>
                 <p className="body-text">
@@ -981,7 +981,7 @@ export default function LandingPage() {
               seconds.
             </p>
             <Link href="/app" className="btn-accent btn-lg">
-              Open FocusKitty — free →
+              Open FocusKitty - free →
             </Link>
           </div>
         </Section>

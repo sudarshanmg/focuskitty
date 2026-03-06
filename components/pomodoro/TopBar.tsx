@@ -1,6 +1,6 @@
 "use client";
 
-import { Settings, Sparkles } from "lucide-react";
+import { Settings, Sparkles, BarChart2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip } from "@/components/ui/tooltip";
@@ -9,7 +9,7 @@ import { ViewModePicker } from "@/components/pomodoro/ViewModePicker";
 import { usePomodoroContext } from "@/components/pomodoro/PomodoroContext";
 
 export function TopBar() {
-  const { openPaywall, openSettings } = usePomodoroContext();
+  const { openPaywall, openSettings, openStats } = usePomodoroContext();
 
   return (
     <>
@@ -36,6 +36,18 @@ export function TopBar() {
           style={{ gap: "clamp(4px, 1.5vw, 8px)" }}
         >
           <ViewModePicker />
+
+          <Tooltip content="Stats">
+            <Button
+              variant="secondary"
+              size="icon"
+              onClick={openStats}
+              aria-label="Stats"
+              className="h-8 w-8"
+            >
+              <BarChart2 size={13} />
+            </Button>
+          </Tooltip>
 
           <Tooltip content="Settings">
             <Button

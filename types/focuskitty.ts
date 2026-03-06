@@ -33,3 +33,17 @@ export const DEFAULT_SETTINGS: Settings = {
   autoStartFocus: false,
   soundEnabled: true,
 };
+
+/* ── Session history ── */
+export interface SessionRecord {
+  id: string; // uuid
+  completedAt: number; // unix ms
+  durationSec: number; // actual seconds focused
+  mode: ModeId;
+}
+
+export interface DayStat {
+  date: string; // "YYYY-MM-DD"
+  focusSec: number;
+  sessions: number;
+}

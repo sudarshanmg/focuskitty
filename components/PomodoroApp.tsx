@@ -5,6 +5,7 @@ import { PomodoroProvider } from "@/components/pomodoro/PomodoroContext";
 import { PomodoroCard } from "@/components/pomodoro/PomodoroCard";
 import { PaywallModal } from "@/components/pomodoro/PaywallModal";
 import { SettingsPanel } from "@/components/pomodoro/SettingsPanel";
+import { StatsPanel } from "@/components/pomodoro/StatsPanel";
 import { ZenMode } from "@/components/pomodoro/ZenMode";
 import { CompactMode } from "@/components/pomodoro/CompactMode";
 import { AnalogMode } from "@/components/pomodoro/AnalogMode";
@@ -16,7 +17,6 @@ function PomodoroInner() {
   const { openPaywall } = usePomodoroContext();
   useKeyboardShortcuts();
 
-  // Blur any element focused by Next.js router on navigation
   useEffect(() => {
     const el = document.activeElement as HTMLElement | null;
     el?.blur();
@@ -26,7 +26,6 @@ function PomodoroInner() {
     <div
       className="min-h-dvh flex flex-col items-center justify-center px-4 py-6 gap-3"
       style={{ background: "var(--bg)" }}
-      // Absorb Next.js router focus so buttons don't get it
       tabIndex={-1}
       onFocus={(e) => e.currentTarget.blur()}
     >
@@ -54,6 +53,7 @@ function PomodoroInner() {
 
       <PaywallModal />
       <SettingsPanel />
+      <StatsPanel />
       <ZenMode />
       <CompactMode />
       <AnalogMode />

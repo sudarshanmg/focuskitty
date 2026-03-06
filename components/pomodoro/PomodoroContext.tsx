@@ -12,8 +12,9 @@ import {
 import type { ThemeId, ModeId, Mode, Settings } from "@/types/focuskitty";
 import { DEFAULT_SETTINGS } from "@/types/focuskitty";
 import { fmtTime } from "@/lib/constants";
+import { useSessionHistory } from "@/hooks/useSessionHistory";
+import { canAccess } from "@/config/app.config";
 
-/* Build Mode list from current settings */
 function buildModes(s: Settings): Mode[] {
   return [
     {
@@ -37,7 +38,6 @@ function buildModes(s: Settings): Mode[] {
   ];
 }
 
-/* ── Shape ── */
 interface PomodoroContextValue {
   theme: ThemeId;
   setTheme: (t: ThemeId) => void;
@@ -75,6 +75,14 @@ interface PomodoroContextValue {
   setViewMode: (
     m: "default" | "zen" | "compact" | "analog" | "minimal",
   ) => void;
+
+  isPlusMember: boolean;
+  setIsPlusMember: (v: boolean) => void;
+
+  showStats: boolean;
+  openStats: () => void;
+  closeStats: () => void;
+  statsData: ReturnType<typeof useSessionHistory>;
 }
 
 const PomodoroContext = createContext<PomodoroContextValue | null>(null);
@@ -86,7 +94,6 @@ export function usePomodoroContext() {
   return ctx;
 }
 
-/* ── Provider ── */
 export function PomodoroProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<ThemeId>("chalk");
   const [mode, setMode] = useState<ModeId>("focus");
@@ -95,26 +102,33 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
   const [showPaywall, setShowPaywall] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
+  const [showStats, setShowStats] = useState(false);
   const [viewMode, setViewMode] = useState<
     "default" | "zen" | "compact" | "analog" | "minimal"
   >("default");
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
+  const [isPlusMember, setIsPlusMember] = useState(true);
 
-  // Always derived fresh from settings — never stale
+  const statsData = useSessionHistory(isPlusMember);
+
   const modes = buildModes(settings);
   const currentMode = modes.find((m) => m.id === mode)!;
 
   const [secondsLeft, setSecondsLeft] = useState(currentMode.seconds);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Keep stable ref to statsData.recordSession to avoid effect re-runs
+  const recordSessionRef = useRef(statsData.recordSession);
+  useEffect(() => {
+    recordSessionRef.current = statsData.recordSession;
+  }, [statsData.recordSession]);
 
   useEffect(() => {
     audioRef.current = new Audio("/sounds/chime_1.mp3");
     audioRef.current.preload = "auto";
   }, []);
 
-  /* Apply theme */
   const setTheme = useCallback((t: ThemeId) => {
     setThemeState(t);
     document.documentElement.setAttribute("data-theme", t);
@@ -133,24 +147,25 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
             clearInterval(intervalRef.current!);
             setRunning(false);
 
-            // Play chime if enabled
             if (settings.soundEnabled && audioRef.current) {
               audioRef.current.currentTime = 0;
-              audioRef.current.play().catch(() => {}); // ignore autoplay policy errors
+              audioRef.current.play().catch(() => {});
             }
 
-            // Determine next mode
+            // Record completed focus session
+            if (mode === "focus") {
+              recordSessionRef.current("focus", currentMode.seconds);
+            }
+
             const isBreak = mode !== "focus";
             let nextModeId: ModeId;
 
             if (mode === "focus") {
-              // After focus: check if long break is due
               const nextDone = (sessionsDone + 1) % settings.sessionsPerCycle;
               const isLongBreak = nextDone === 0;
               nextModeId = isLongBreak ? "long" : "short";
               setSessionsDone((d) => (d + 1) % settings.sessionsPerCycle);
             } else {
-              // After any break: go back to focus
               nextModeId = "focus";
             }
 
@@ -158,22 +173,20 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
               (m) => m.id === nextModeId,
             )!.seconds;
 
-            // Auto-start: switch mode and begin next timer
             if (!isBreak && settings.autoStartBreaks) {
               setMode(nextModeId);
-              setSecondsLeft(nextSeconds); // set before running so first tick is correct
+              setSecondsLeft(nextSeconds);
               setTimeout(() => setRunning(true), 800);
             } else if (isBreak && settings.autoStartFocus) {
               setMode(nextModeId);
               setSecondsLeft(nextSeconds);
               setTimeout(() => setRunning(true), 800);
             } else {
-              // No auto-start: just switch to next mode ready to go
               setMode(nextModeId);
               setSecondsLeft(nextSeconds);
             }
 
-            return nextSeconds; // return new duration so secondsLeft is never 0
+            return nextSeconds;
           }
           return s - 1;
         });
@@ -184,16 +197,14 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [running, mode, sessionsDone, settings]);
+  }, [running, mode, sessionsDone, settings, currentMode.seconds]);
 
-  /* Tab title */
   useEffect(() => {
     document.title = running
       ? `${fmtTime(secondsLeft)} — FocusKitty`
       : "FocusKitty — Focus Timer";
   }, [secondsLeft, running]);
 
-  /* changeMode: always read fresh seconds from current settings */
   const changeMode = useCallback(
     (m: Mode) => {
       setMode(m.id);
@@ -219,7 +230,6 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
     setSecondsLeft(currentMode.seconds);
   }, [mode, currentMode.seconds, settings.sessionsPerCycle]);
 
-  /* updateSettings: only reset timer if the ACTIVE mode's duration changed */
   const updateSettings = useCallback(
     (patch: Partial<Settings>) => {
       setSettings((prev) => {
@@ -243,6 +253,14 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
   const pct = Math.round(
     ((currentMode.seconds - secondsLeft) / currentMode.seconds) * 100,
   );
+
+  const openStats = useCallback(() => {
+    if (canAccess("stats_daily", isPlusMember)) {
+      setShowStats(true);
+    } else {
+      setShowPaywall(true);
+    }
+  }, [isPlusMember]);
 
   return (
     <PomodoroContext.Provider
@@ -274,6 +292,12 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
         closeShortcuts: () => setShowShortcuts(false),
         viewMode,
         setViewMode,
+        isPlusMember,
+        setIsPlusMember,
+        showStats,
+        openStats,
+        closeStats: () => setShowStats(false),
+        statsData,
       }}
     >
       {children}
