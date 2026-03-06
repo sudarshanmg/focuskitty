@@ -1,8 +1,8 @@
 "use client";
-
-import { PomodoroProvider }  from "@/components/pomodoro/PomodoroContext";
-import { PomodoroCard }      from "@/components/pomodoro/PomodoroCard";
-import { PaywallModal }      from "@/components/pomodoro/PaywallModal";
+import { PomodoroProvider } from "@/components/pomodoro/PomodoroContext";
+import { PomodoroCard } from "@/components/pomodoro/PomodoroCard";
+import { PaywallModal } from "@/components/pomodoro/PaywallModal";
+import { SettingsPanel } from "@/components/pomodoro/SettingsPanel";
 import { usePomodoroContext } from "@/components/pomodoro/PomodoroContext";
 
 /* Inner wrapper so we can read context for the upgrade nudge */
@@ -38,6 +38,7 @@ function PomodoroInner() {
       </button>
 
       <PaywallModal />
+      <SettingsPanel />
     </div>
   );
 }

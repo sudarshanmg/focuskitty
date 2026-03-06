@@ -9,21 +9,44 @@ import {
   useCallback,
   type ReactNode,
 } from "react";
-import type { ThemeId, ModeId, Mode } from "@/types/focuskitty";
-import { MODES, SESSIONS_PER_CYCLE, fmtTime } from "@/lib/constants";
+import type { ThemeId, ModeId, Mode, Settings } from "@/types/focuskitty";
+import { DEFAULT_SETTINGS } from "@/types/focuskitty";
+import { fmtTime } from "@/lib/constants";
+
+/* Build Mode list from current settings */
+function buildModes(s: Settings): Mode[] {
+  return [
+    {
+      id: "focus",
+      label: "Focus",
+      seconds: s.focusMinutes * 60,
+      locked: false,
+    },
+    {
+      id: "short",
+      label: "Short Break",
+      seconds: s.shortBreakMinutes * 60,
+      locked: false,
+    },
+    {
+      id: "long",
+      label: "Long Break",
+      seconds: s.longBreakMinutes * 60,
+      locked: false,
+    },
+  ];
+}
 
 /* ── Shape ── */
 interface PomodoroContextValue {
-  /* theme */
   theme: ThemeId;
   setTheme: (t: ThemeId) => void;
 
-  /* mode */
+  modes: Mode[];
   mode: ModeId;
   currentMode: Mode;
   changeMode: (m: Mode) => void;
 
-  /* timer */
   running: boolean;
   secondsLeft: number;
   pct: number;
@@ -31,13 +54,18 @@ interface PomodoroContextValue {
   reset: () => void;
   skip: () => void;
 
-  /* sessions */
   sessionsDone: number;
+  sessionsPerCycle: number;
 
-  /* paywall */
   showPaywall: boolean;
   openPaywall: () => void;
   closePaywall: () => void;
+
+  settings: Settings;
+  updateSettings: (patch: Partial<Settings>) => void;
+  showSettings: boolean;
+  openSettings: () => void;
+  closeSettings: () => void;
 }
 
 const PomodoroContext = createContext<PomodoroContextValue | null>(null);
@@ -54,14 +82,19 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<ThemeId>("chalk");
   const [mode, setMode] = useState<ModeId>("focus");
   const [running, setRunning] = useState(false);
-  const [secondsLeft, setSecondsLeft] = useState(MODES[0].seconds);
   const [sessionsDone, setSessionsDone] = useState(0);
   const [showPaywall, setShowPaywall] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
 
+  // Always derived fresh from settings — never stale
+  const modes = buildModes(settings);
+  const currentMode = modes.find((m) => m.id === mode)!;
+
+  const [secondsLeft, setSecondsLeft] = useState(currentMode.seconds);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const currentMode = MODES.find((m) => m.id === mode)!;
 
-  /* Apply theme attribute to <html> */
+  /* Apply theme */
   const setTheme = useCallback((t: ThemeId) => {
     setThemeState(t);
     document.documentElement.setAttribute("data-theme", t);
@@ -75,14 +108,46 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (running) {
       intervalRef.current = setInterval(() => {
-        setSecondsLeft((s: any) => {
+        setSecondsLeft((s) => {
           if (s <= 1) {
             clearInterval(intervalRef.current!);
             setRunning(false);
+
+            // Determine next mode
+            const isBreak = mode !== "focus";
+            let nextModeId: ModeId;
+
             if (mode === "focus") {
-              setSessionsDone((d) => (d + 1) % (SESSIONS_PER_CYCLE + 1));
+              // After focus: check if long break is due
+              const nextDone = (sessionsDone + 1) % settings.sessionsPerCycle;
+              const isLongBreak = nextDone === 0;
+              nextModeId = isLongBreak ? "long" : "short";
+              setSessionsDone((d) => (d + 1) % settings.sessionsPerCycle);
+            } else {
+              // After any break: go back to focus
+              nextModeId = "focus";
             }
-            return 0;
+
+            const nextSeconds = buildModes(settings).find(
+              (m) => m.id === nextModeId,
+            )!.seconds;
+
+            // Auto-start: switch mode and begin next timer
+            if (!isBreak && settings.autoStartBreaks) {
+              setMode(nextModeId);
+              setSecondsLeft(nextSeconds); // set before running so first tick is correct
+              setTimeout(() => setRunning(true), 800);
+            } else if (isBreak && settings.autoStartFocus) {
+              setMode(nextModeId);
+              setSecondsLeft(nextSeconds);
+              setTimeout(() => setRunning(true), 800);
+            } else {
+              // No auto-start: just switch to next mode ready to go
+              setMode(nextModeId);
+              setSecondsLeft(nextSeconds);
+            }
+
+            return nextSeconds; // return new duration so secondsLeft is never 0
           }
           return s - 1;
         });
@@ -93,24 +158,26 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [running, mode]);
+  }, [running, mode, sessionsDone, settings]);
 
-  /* Browser tab title */
+  /* Tab title */
   useEffect(() => {
     document.title = running
-      ? `${fmtTime(secondsLeft)} — Pomo`
-      : "Pomo — Focus Timer";
+      ? `${fmtTime(secondsLeft)} — FocusKitty`
+      : "FocusKitty — Focus Timer";
   }, [secondsLeft, running]);
 
-  const changeMode = useCallback((m: Mode) => {
-    if (m.locked) {
-      setShowPaywall(true);
-      return;
-    }
-    setMode(m.id);
-    setRunning(false);
-    setSecondsLeft(m.seconds);
-  }, []);
+  /* changeMode: always read fresh seconds from current settings */
+  const changeMode = useCallback(
+    (m: Mode) => {
+      setMode(m.id);
+      setRunning(false);
+      setSecondsLeft(
+        buildModes(settings).find((fm) => fm.id === m.id)!.seconds,
+      );
+    },
+    [settings],
+  );
 
   const toggle = useCallback(() => setRunning((r) => !r), []);
 
@@ -122,9 +189,30 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
   const skip = useCallback(() => {
     setRunning(false);
     if (mode === "focus")
-      setSessionsDone((d) => (d + 1) % (SESSIONS_PER_CYCLE + 1));
+      setSessionsDone((d) => (d + 1) % settings.sessionsPerCycle);
     setSecondsLeft(currentMode.seconds);
-  }, [mode, currentMode.seconds]);
+  }, [mode, currentMode.seconds, settings.sessionsPerCycle]);
+
+  /* updateSettings: only reset timer if the ACTIVE mode's duration changed */
+  const updateSettings = useCallback(
+    (patch: Partial<Settings>) => {
+      setSettings((prev) => {
+        const next = { ...prev, ...patch };
+        const prevSeconds = buildModes(prev).find(
+          (m) => m.id === mode,
+        )!.seconds;
+        const nextSeconds = buildModes(next).find(
+          (m) => m.id === mode,
+        )!.seconds;
+        if (prevSeconds !== nextSeconds) {
+          setRunning(false);
+          setSecondsLeft(nextSeconds);
+        }
+        return next;
+      });
+    },
+    [mode],
+  );
 
   const pct = Math.round(
     ((currentMode.seconds - secondsLeft) / currentMode.seconds) * 100,
@@ -135,8 +223,9 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
       value={{
         theme,
         setTheme,
+        modes,
         mode,
-        currentMode,
+        currentMode: { ...currentMode },
         changeMode,
         running,
         secondsLeft,
@@ -145,9 +234,15 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
         reset,
         skip,
         sessionsDone,
+        sessionsPerCycle: settings.sessionsPerCycle,
         showPaywall,
         openPaywall: () => setShowPaywall(true),
         closePaywall: () => setShowPaywall(false),
+        settings,
+        updateSettings,
+        showSettings,
+        openSettings: () => setShowSettings(true),
+        closeSettings: () => setShowSettings(false),
       }}
     >
       {children}

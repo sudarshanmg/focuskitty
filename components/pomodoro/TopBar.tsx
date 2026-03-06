@@ -1,17 +1,16 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Maximize2, Minimize2 } from "lucide-react";
+import { Maximize2, Minimize2, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ThemePicker } from "@/components/pomodoro/ThemePicker";
 import { usePomodoroContext } from "@/components/pomodoro/PomodoroContext";
 
 export function TopBar() {
-  const { openPaywall } = usePomodoroContext();
+  const { openPaywall, openSettings } = usePomodoroContext();
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  /* Sync state with actual fullscreen changes (e.g. Esc key) */
   useEffect(() => {
     const handler = () => setIsFullscreen(!!document.fullscreenElement);
     document.addEventListener("fullscreenchange", handler);
@@ -29,7 +28,6 @@ export function TopBar() {
   return (
     <>
       <div className="flex items-center justify-between px-5 pt-5 pb-4">
-        {/* Logo */}
         <span
           className="font-semibold tracking-tighter"
           style={{ fontSize: "0.92rem", color: "var(--text-primary)" }}
@@ -38,24 +36,30 @@ export function TopBar() {
         </span>
 
         <div className="flex items-center gap-2">
-          {/* Fullscreen toggle */}
+          {/* Fullscreen */}
           <Button
             variant="secondary"
             size="icon"
             onClick={toggleFullscreen}
             aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
-            title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
           >
-            {isFullscreen
-              ? <Minimize2 size={14} />
-              : <Maximize2 size={14} />
-            }
+            {isFullscreen ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+          </Button>
+
+          {/* Settings */}
+          <Button
+            variant="secondary"
+            size="icon"
+            onClick={openSettings}
+            aria-label="Settings"
+          >
+            <Settings size={14} />
           </Button>
 
           {/* Theme picker */}
           <ThemePicker />
 
-          {/* Plus badge */}
+          {/* Plus */}
           <Button
             variant="ghost"
             size="sm"
