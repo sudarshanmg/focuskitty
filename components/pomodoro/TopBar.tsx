@@ -34,7 +34,7 @@ export function TopBar() {
           className="font-semibold tracking-tighter"
           style={{ fontSize: "0.92rem", color: "var(--text-primary)" }}
         >
-          pomo.
+          focuskitty.
         </span>
 
         <div className="flex items-center gap-2">

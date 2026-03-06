@@ -9,7 +9,7 @@ export function PomodoroCard() {
   return (
     <div
       className="card w-full animate-fade-in"
-      style={{ maxWidth: 380, padding: 0, overflow: "hidden" }}
+      style={{ maxWidth: "clamp(300px, 38vw, 460px)", padding: 0, overflow: "hidden" }}
     >
       <TopBar />
       <ModeTabs />

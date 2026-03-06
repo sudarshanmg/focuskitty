@@ -80,7 +80,7 @@ export function PaywallModal() {
             }}
             onClick={closePaywall}
           >
-            Get Pomo Plus →
+            Get FocusKitty Plus →
           </Button>
           <Button
             variant="outline"

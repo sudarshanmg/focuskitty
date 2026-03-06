@@ -31,17 +31,19 @@ export function TimerRing() {
   const dashOffset = calcDashOffset(secondsLeft, currentMode.seconds);
   const currentSession = (sessionsDone % SESSIONS_PER_CYCLE) + 1;
 
+  const ringSize = "clamp(180px, 28vmin, 240px)";
+
   return (
     <div className="flex flex-col items-center gap-3 px-6 pt-2 pb-6">
 
       {/* ── Ring ── */}
       <div
         className="relative flex items-center justify-center"
-        style={{ width: 200, height: 200 }}
+        style={{ width: ringSize, height: ringSize }}
       >
         <svg
-          width="200"
-          height="200"
+          width="100%"
+          height="100%"
           viewBox="0 0 220 220"
           style={{ transform: "rotate(-90deg)" }}
         >
@@ -78,8 +80,8 @@ export function TimerRing() {
           <span
             style={{
               fontFamily: "'Nunito', 'Varela Round', sans-serif",
-              fontSize: "3.2rem",
-              fontWeight: 600,
+              fontSize: "clamp(2.4rem, 5.5vmin, 3.4rem)",
+              fontWeight: 300,
               letterSpacing: "0.02em",
               color: "var(--text-primary)",
               lineHeight: 1,

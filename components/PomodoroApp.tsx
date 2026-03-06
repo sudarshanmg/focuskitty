@@ -11,7 +11,7 @@ function PomodoroInner() {
 
   return (
     <div
-      className="min-h-dvh flex flex-col items-center justify-center px-4 py-8 gap-4"
+      className="min-h-dvh flex flex-col items-center justify-center px-4 py-6 gap-3"
       style={{ background: "var(--bg)" }}
     >
       <PomodoroCard />

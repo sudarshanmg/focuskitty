@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Pomo — Minimal Pomodoro Timer",
-  description: "A beautiful, minimalist Pomodoro timer to help you focus.",
+  title: "FocusKitty — Minimal Pomodoro Timer",
+  description: "A beautiful, minimalist focus timer to help you stay on track.",
 };
 
 export default function RootLayout({

@@ -112,7 +112,7 @@ export function ModeTabs() {
   return (
     <div
       ref={containerRef}
-      className="relative flex items-center mx-5 my-3 rounded-full p-1"
+      className="relative flex items-center mx-3 my-3 rounded-full p-1"
       style={{ background: "var(--progress-track)" }}
     >
       {/* Jelly pill */}
