@@ -1,6 +1,6 @@
 "use client";
 
-import { Settings } from "lucide-react";
+import { Settings, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip } from "@/components/ui/tooltip";
@@ -62,7 +62,7 @@ export function TopBar() {
             }}
             onClick={openPaywall}
           >
-            <span style={{ fontSize: 8 }}>✦</span>
+            <Sparkles size={10} />
             Plus
           </Button>
         </div>

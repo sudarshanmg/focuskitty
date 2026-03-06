@@ -139,7 +139,11 @@ export function ModeTabs() {
     <div
       ref={containerRef}
       className="relative flex items-center mx-3 my-3 rounded-full p-1"
-      style={{ background: "var(--progress-track)" }}
+      style={{
+        background: "var(--progress-track)",
+        opacity: ready ? 1 : 0,
+        transition: "opacity 0.15s ease",
+      }}
     >
       {ready && (
         <span
@@ -169,7 +173,11 @@ export function ModeTabs() {
             "relative z-10 flex-1 text-center mode-tab",
             mode === m.id && "active",
           )}
-          style={{ background: "transparent", boxShadow: "none" }}
+          style={{
+            background: "transparent",
+            boxShadow: "none",
+            outline: "none",
+          }}
         >
           {m.label}
         </button>

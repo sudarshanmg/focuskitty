@@ -85,12 +85,10 @@ function PreviewDefault() {
 function PreviewZen() {
   return (
     <svg viewBox="0 0 48 36" fill="none" width="100%" height="100%">
-      {/* Full bg */}
       <rect x="0" y="0" width="48" height="36" rx="3" fill="var(--bg)" />
-      {/* Large ring */}
       <circle
         cx="24"
-        cy="18"
+        cy="17"
         r="11"
         stroke="var(--progress-track)"
         strokeWidth="1.5"
@@ -98,7 +96,7 @@ function PreviewZen() {
       />
       <circle
         cx="24"
-        cy="18"
+        cy="17"
         r="11"
         stroke="var(--accent)"
         strokeWidth="1.5"
@@ -107,19 +105,18 @@ function PreviewZen() {
         strokeLinecap="round"
         strokeDashoffset="10"
       />
-      {/* Time */}
       <rect
         x="18"
-        y="16"
+        y="15"
         width="12"
         height="3"
         rx="1"
         fill="var(--text-primary)"
         opacity="0.4"
       />
-      {/* Dots */}
-      <circle cx="20" cy="31" r="1.2" fill="var(--accent)" />
-      <circle cx="24" cy="31" r="1.2" fill="var(--progress-track)" />
+      {/* middle dot = current session */}
+      <circle cx="20" cy="31" r="1.2" fill="var(--progress-track)" />
+      <circle cx="24" cy="31" r="1.2" fill="var(--accent)" />
       <circle cx="28" cy="31" r="1.2" fill="var(--progress-track)" />
     </svg>
   );
@@ -128,7 +125,6 @@ function PreviewZen() {
 function PreviewCompact() {
   return (
     <svg viewBox="0 0 48 36" fill="none" width="100%" height="100%">
-      {/* Bg */}
       <rect
         x="0"
         y="0"
@@ -138,20 +134,20 @@ function PreviewCompact() {
         fill="var(--bg)"
         opacity="0.3"
       />
-      {/* Pill in corner */}
+      {/* pill — inset so play button doesn't clip */}
       <rect
-        x="8"
+        x="6"
         y="18"
-        width="32"
+        width="36"
         height="13"
         rx="6.5"
         fill="var(--bg-card)"
         stroke="var(--border)"
         strokeWidth="0.8"
       />
-      {/* Mini ring */}
+      {/* mini ring */}
       <circle
-        cx="18"
+        cx="16"
         cy="24.5"
         r="4"
         stroke="var(--progress-track)"
@@ -159,7 +155,7 @@ function PreviewCompact() {
         fill="none"
       />
       <circle
-        cx="18"
+        cx="16"
         cy="24.5"
         r="4"
         stroke="var(--accent)"
@@ -169,29 +165,29 @@ function PreviewCompact() {
         strokeLinecap="round"
         strokeDashoffset="4"
       />
-      {/* Time */}
+      {/* time + mode label */}
       <rect
-        x="24"
-        y="22.5"
-        width="8"
-        height="2"
+        x="22"
+        y="22"
+        width="9"
+        height="2.5"
         rx="1"
         fill="var(--text-primary)"
-        opacity="0.5"
+        opacity="0.45"
       />
       <rect
-        x="24"
+        x="22"
         y="26"
-        width="5"
+        width="6"
         height="1.5"
         rx="0.75"
         fill="var(--text-muted)"
-        opacity="0.4"
+        opacity="0.3"
       />
-      {/* Play btn */}
-      <circle cx="36" cy="24.5" r="3.5" fill="var(--accent)" />
+      {/* play button — inset from right */}
+      <circle cx="37" cy="24.5" r="3.5" fill="var(--accent)" />
       <polygon
-        points="35.2,23.2 35.2,25.8 38,24.5"
+        points="36.1,23.1 36.1,25.9 39,24.5"
         fill="var(--btn-text, white)"
         opacity="0.9"
       />
@@ -345,7 +341,7 @@ export function ViewModePicker() {
     setViewMode(id);
     // Auto-close after 3s
     if (closeTimer.current) clearTimeout(closeTimer.current);
-    closeTimer.current = setTimeout(() => setOpen(false), 2000);
+    closeTimer.current = setTimeout(() => setOpen(false), 1000);
   };
 
   // Clean up on unmount
