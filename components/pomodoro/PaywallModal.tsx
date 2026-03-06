@@ -11,10 +11,12 @@ import { Button } from "@/components/ui/button";
 import { usePomodoroContext } from "@/components/pomodoro/PomodoroContext";
 
 const PLUS_FEATURES = [
-  "Custom session lengths",
-  "Daily & weekly stats",
+  "Daily & weekly focus stats",
   "Ambient soundscapes",
   "Unlimited session history",
+  "Focus streaks & milestones",
+  "Calendar integration",
+  "Priority support",
 ];
 
 export function PaywallModal() {
@@ -39,7 +41,7 @@ export function PaywallModal() {
         <DialogHeader>
           <DialogTitle>Unlock Plus</DialogTitle>
           <DialogDescription>
-            Custom durations, stats, soundscapes &amp; more.
+            Stats, soundscapes, streaks &amp; more.
           </DialogDescription>
         </DialogHeader>
 

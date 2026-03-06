@@ -5,6 +5,9 @@ import { PomodoroCard } from "@/components/pomodoro/PomodoroCard";
 import { PaywallModal } from "@/components/pomodoro/PaywallModal";
 import { SettingsPanel } from "@/components/pomodoro/SettingsPanel";
 import { ZenMode } from "@/components/pomodoro/ZenMode";
+import { CompactMode } from "@/components/pomodoro/CompactMode";
+import { AnalogMode } from "@/components/pomodoro/AnalogMode";
+import { MinimalMode } from "@/components/pomodoro/MinimalMode";
 import { usePomodoroContext } from "@/components/pomodoro/PomodoroContext";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 
@@ -42,6 +45,9 @@ function PomodoroInner() {
       <PaywallModal />
       <SettingsPanel />
       <ZenMode />
+      <CompactMode />
+      <AnalogMode />
+      <MinimalMode />
     </div>
   );
 }

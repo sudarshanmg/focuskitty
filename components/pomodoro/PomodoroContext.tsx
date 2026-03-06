@@ -71,8 +71,10 @@ interface PomodoroContextValue {
   openShortcuts: () => void;
   closeShortcuts: () => void;
 
-  viewMode: "default" | "zen";
-  setViewMode: (m: "default" | "zen") => void;
+  viewMode: "default" | "zen" | "compact" | "analog" | "minimal";
+  setViewMode: (
+    m: "default" | "zen" | "compact" | "analog" | "minimal",
+  ) => void;
 }
 
 const PomodoroContext = createContext<PomodoroContextValue | null>(null);
@@ -93,7 +95,9 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
   const [showPaywall, setShowPaywall] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
-  const [viewMode, setViewMode] = useState<"default" | "zen">("default");
+  const [viewMode, setViewMode] = useState<
+    "default" | "zen" | "compact" | "analog" | "minimal"
+  >("default");
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
 
   // Always derived fresh from settings — never stale

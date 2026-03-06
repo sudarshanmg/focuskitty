@@ -33,19 +33,12 @@ export function ZenMode() {
 
   const isZen = viewMode === "zen";
 
-  /* Fade in on enter, fade out on exit */
+  /* Esc exits zen — handled by useKeyboardShortcuts globally */
+  /* Fade in/out */
   useEffect(() => {
-    if (isZen) {
-      document.documentElement.requestFullscreen?.().catch(() => {});
-      setTimeout(() => setVisible(true), 20);
-    } else {
-      setVisible(false);
-      if (document.fullscreenElement)
-        document.exitFullscreen?.().catch(() => {});
-    }
+    if (isZen) setTimeout(() => setVisible(true), 20);
+    else setVisible(false);
   }, [isZen]);
-
-  /* Fade mode label on change */
   useEffect(() => {
     setFadeMode(false);
     const t = setTimeout(() => {

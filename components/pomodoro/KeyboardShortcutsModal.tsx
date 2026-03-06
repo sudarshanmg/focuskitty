@@ -14,10 +14,12 @@ const SHORTCUTS = [
   { action: "Play / Pause", keys: ["Space"] },
   { action: "Reset timer", keys: ["R"] },
   { action: "Next session", keys: ["N"] },
-  { action: "Zen mode", keys: ["Z"] },
-  { action: "Focus mode", keys: ["1"] },
-  { action: "Short Break", keys: ["2"] },
-  { action: "Long Break", keys: ["3"] },
+  { action: "Exit view", keys: ["Esc"] },
+  { action: "Default view", keys: ["1"] },
+  { action: "Zen view", keys: ["2"] },
+  { action: "Compact view", keys: ["3"] },
+  { action: "Analog view", keys: ["4"] },
+  { action: "Minimal view", keys: ["5"] },
 ];
 
 export function KeyboardShortcutsModal({ open, onClose }: Props) {

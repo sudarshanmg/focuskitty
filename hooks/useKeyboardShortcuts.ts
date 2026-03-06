@@ -3,13 +3,13 @@
 import { useEffect } from "react";
 import { usePomodoroContext } from "@/components/pomodoro/PomodoroContext";
 
+const VIEW_MODES = ["default", "zen", "compact", "analog", "minimal"] as const;
+
 export function useKeyboardShortcuts() {
   const {
     toggle,
     reset,
     skip,
-    changeMode,
-    modes,
     showSettings,
     showPaywall,
     viewMode,
@@ -22,13 +22,12 @@ export function useKeyboardShortcuts() {
       if (tag === "INPUT" || tag === "TEXTAREA") return;
       if (showSettings || showPaywall) return;
 
-      // Escape exits zen
-      if (e.key === "Escape" && viewMode === "zen") {
+      // Escape exits any non-default view
+      if (e.key === "Escape" && viewMode !== "default") {
         setViewMode("default");
         return;
       }
 
-      // In zen mode, only allow playback controls + exit
       switch (e.key) {
         case " ":
           e.preventDefault();
@@ -42,33 +41,26 @@ export function useKeyboardShortcuts() {
         case "N":
           skip();
           break;
-        case "z":
-        case "Z":
-          setViewMode(viewMode === "zen" ? "default" : "zen");
-          break;
+        // View mode shortcuts: 1-5
         case "1":
-          if (viewMode !== "zen") changeMode(modes[0]);
+          setViewMode("default");
           break;
         case "2":
-          if (viewMode !== "zen") changeMode(modes[1]);
+          setViewMode("zen");
           break;
         case "3":
-          if (viewMode !== "zen") changeMode(modes[2]);
+          setViewMode("compact");
+          break;
+        case "4":
+          setViewMode("analog");
+          break;
+        case "5":
+          setViewMode("minimal");
           break;
       }
     };
 
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [
-    toggle,
-    reset,
-    skip,
-    changeMode,
-    modes,
-    showSettings,
-    showPaywall,
-    viewMode,
-    setViewMode,
-  ]);
+  }, [toggle, reset, skip, showSettings, showPaywall, viewMode, setViewMode]);
 }

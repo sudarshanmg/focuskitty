@@ -1,17 +1,15 @@
 "use client";
 
-import { Expand, Blend } from "lucide-react";
+import { Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip } from "@/components/ui/tooltip";
 import { ThemePicker } from "@/components/pomodoro/ThemePicker";
+import { ViewModePicker } from "@/components/pomodoro/ViewModePicker";
 import { usePomodoroContext } from "@/components/pomodoro/PomodoroContext";
 
 export function TopBar() {
-  const { openPaywall, openSettings, viewMode, setViewMode } =
-    usePomodoroContext();
-
-  const enterZen = () => setViewMode("zen");
+  const { openPaywall, openSettings } = usePomodoroContext();
 
   return (
     <>
@@ -24,19 +22,8 @@ export function TopBar() {
         </span>
 
         <div className="flex items-center gap-2">
-          {/* Zen mode */}
-          <Tooltip content="Zen mode">
-            <Button
-              variant="secondary"
-              size="icon"
-              onClick={enterZen}
-              aria-label="Enter zen mode"
-            >
-              <Expand size={14} />
-            </Button>
-          </Tooltip>
+          <ViewModePicker />
 
-          {/* Settings */}
           <Tooltip content="Settings">
             <Button
               variant="secondary"
@@ -44,14 +31,12 @@ export function TopBar() {
               onClick={openSettings}
               aria-label="Settings"
             >
-              <Blend size={14} />
+              <Settings size={14} />
             </Button>
           </Tooltip>
 
-          {/* Theme picker */}
           <ThemePicker />
 
-          {/* Plus */}
           <Button
             variant="ghost"
             size="sm"
