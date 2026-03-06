@@ -9,57 +9,54 @@ import {
   useCallback,
   type ReactNode,
 } from "react";
-import type { ThemeId, ModeId, Mode } from "@/types/pomodoro";
-import {
-  MODES,
-  SESSIONS_PER_CYCLE,
-  fmtTime,
-} from "@/lib/constants"
+import type { ThemeId, ModeId, Mode } from "@/types/focuskitty";
+import { MODES, SESSIONS_PER_CYCLE, fmtTime } from "@/lib/constants";
 
 /* ── Shape ── */
 interface PomodoroContextValue {
   /* theme */
-  theme:    ThemeId;
+  theme: ThemeId;
   setTheme: (t: ThemeId) => void;
 
   /* mode */
-  mode:        ModeId;
+  mode: ModeId;
   currentMode: Mode;
-  changeMode:  (m: Mode) => void;
+  changeMode: (m: Mode) => void;
 
   /* timer */
-  running:     boolean;
+  running: boolean;
   secondsLeft: number;
-  pct:         number;
-  toggle:      () => void;
-  reset:       () => void;
-  skip:        () => void;
+  pct: number;
+  toggle: () => void;
+  reset: () => void;
+  skip: () => void;
 
   /* sessions */
   sessionsDone: number;
 
   /* paywall */
-  showPaywall:    boolean;
-  openPaywall:    () => void;
-  closePaywall:   () => void;
+  showPaywall: boolean;
+  openPaywall: () => void;
+  closePaywall: () => void;
 }
 
 const PomodoroContext = createContext<PomodoroContextValue | null>(null);
 
 export function usePomodoroContext() {
   const ctx = useContext(PomodoroContext);
-  if (!ctx) throw new Error("usePomodoroContext must be used inside PomodoroProvider");
+  if (!ctx)
+    throw new Error("usePomodoroContext must be used inside PomodoroProvider");
   return ctx;
 }
 
 /* ── Provider ── */
 export function PomodoroProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState]       = useState<ThemeId>("chalk");
-  const [mode, setMode]              = useState<ModeId>("focus");
-  const [running, setRunning]        = useState(false);
-  const [secondsLeft, setSecondsLeft]= useState(MODES[0].seconds);
+  const [theme, setThemeState] = useState<ThemeId>("chalk");
+  const [mode, setMode] = useState<ModeId>("focus");
+  const [running, setRunning] = useState(false);
+  const [secondsLeft, setSecondsLeft] = useState(MODES[0].seconds);
   const [sessionsDone, setSessionsDone] = useState(0);
-  const [showPaywall, setShowPaywall]= useState(false);
+  const [showPaywall, setShowPaywall] = useState(false);
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const currentMode = MODES.find((m) => m.id === mode)!;
@@ -106,7 +103,10 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
   }, [secondsLeft, running]);
 
   const changeMode = useCallback((m: Mode) => {
-    if (m.locked) { setShowPaywall(true); return; }
+    if (m.locked) {
+      setShowPaywall(true);
+      return;
+    }
     setMode(m.id);
     setRunning(false);
     setSecondsLeft(m.seconds);
@@ -121,24 +121,35 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
 
   const skip = useCallback(() => {
     setRunning(false);
-    if (mode === "focus") setSessionsDone((d) => (d + 1) % (SESSIONS_PER_CYCLE + 1));
+    if (mode === "focus")
+      setSessionsDone((d) => (d + 1) % (SESSIONS_PER_CYCLE + 1));
     setSecondsLeft(currentMode.seconds);
   }, [mode, currentMode.seconds]);
 
   const pct = Math.round(
-    ((currentMode.seconds - secondsLeft) / currentMode.seconds) * 100
+    ((currentMode.seconds - secondsLeft) / currentMode.seconds) * 100,
   );
 
   return (
-    <PomodoroContext.Provider value={{
-      theme, setTheme,
-      mode, currentMode, changeMode,
-      running, secondsLeft, pct, toggle, reset, skip,
-      sessionsDone,
-      showPaywall,
-      openPaywall:  () => setShowPaywall(true),
-      closePaywall: () => setShowPaywall(false),
-    }}>
+    <PomodoroContext.Provider
+      value={{
+        theme,
+        setTheme,
+        mode,
+        currentMode,
+        changeMode,
+        running,
+        secondsLeft,
+        pct,
+        toggle,
+        reset,
+        skip,
+        sessionsDone,
+        showPaywall,
+        openPaywall: () => setShowPaywall(true),
+        closePaywall: () => setShowPaywall(false),
+      }}
+    >
       {children}
     </PomodoroContext.Provider>
   );

@@ -4,25 +4,28 @@ import { useRef, useState, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import { MODES } from "@/lib/constants";
 import { usePomodoroContext } from "@/components/pomodoro/PomodoroContext";
-import type { Mode } from "@/types/pomodoro";
+import type { Mode } from "@/types/focuskitty";
 
 /* Pill geometry */
-interface PillRect { left: number; width: number; }
+interface PillRect {
+  left: number;
+  width: number;
+}
 
 export function ModeTabs() {
   const { mode, changeMode } = usePomodoroContext();
-  const containerRef  = useRef<HTMLDivElement>(null);
-  const buttonRefs    = useRef<(HTMLButtonElement | null)[]>([]);
-  const pillRef       = useRef<HTMLSpanElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const pillRef = useRef<HTMLSpanElement>(null);
 
-  const [pill, setPill]   = useState<PillRect>({ left: 0, width: 0 });
+  const [pill, setPill] = useState<PillRect>({ left: 0, width: 0 });
   const [ready, setReady] = useState(false);
-  const prevPill          = useRef<PillRect>({ left: 0, width: 0 });
+  const prevPill = useRef<PillRect>({ left: 0, width: 0 });
 
   const measure = useCallback((modeId: string): PillRect | null => {
     const activeIndex = MODES.findIndex((m) => m.id === modeId);
-    const btn         = buttonRefs.current[activeIndex];
-    const container   = containerRef.current;
+    const btn = buttonRefs.current[activeIndex];
+    const container = containerRef.current;
     if (!btn || !container) return null;
     const cr = container.getBoundingClientRect();
     const br = btn.getBoundingClientRect();
@@ -44,11 +47,11 @@ export function ModeTabs() {
     const next = measure(mode);
     if (!next) return;
 
-    const prev    = prevPill.current;
-    const el      = pillRef.current;
+    const prev = prevPill.current;
+    const el = pillRef.current;
     if (!el) return;
 
-    const goingRight  = next.left > prev.left;
+    const goingRight = next.left > prev.left;
     const stretchRatio = 1.18; // how much the pill stretches during travel
 
     /* Cancel any running animation */
@@ -66,12 +69,14 @@ export function ModeTabs() {
     el.animate(
       [
         // start
-        { left: `${prev.left}px`, width: `${prev.width}px`, borderRadius: "980px" },
+        {
+          left: `${prev.left}px`,
+          width: `${prev.width}px`,
+          borderRadius: "980px",
+        },
         // stretch toward target
         {
-          left: goingRight
-            ? `${prev.left}px`
-            : `${next.left}px`,
+          left: goingRight ? `${prev.left}px` : `${next.left}px`,
           width: `${stretchW}px`,
           borderRadius: "980px",
           offset: 0.35,
@@ -91,13 +96,17 @@ export function ModeTabs() {
           offset: 0.82,
         },
         // settle
-        { left: `${next.left}px`, width: `${next.width}px`, borderRadius: "980px" },
+        {
+          left: `${next.left}px`,
+          width: `${next.width}px`,
+          borderRadius: "980px",
+        },
       ],
       {
         duration: 420,
         easing: "cubic-bezier(0.22, 1, 0.36, 1)",
         fill: "forwards",
-      }
+      },
     );
 
     /* Sync React state at the end so it matches */
@@ -122,13 +131,13 @@ export function ModeTabs() {
           aria-hidden
           className="absolute top-1 bottom-1 rounded-full"
           style={{
-            left:         pill.left,
-            width:        pill.width,
-            background:   "var(--tab-pill)",
-            boxShadow:    "var(--shadow-sm)",
-            pointerEvents:"none",
-            zIndex:       0,
-            willChange:   "left, width",
+            left: pill.left,
+            width: pill.width,
+            background: "var(--tab-pill)",
+            boxShadow: "var(--shadow-sm)",
+            pointerEvents: "none",
+            zIndex: 0,
+            willChange: "left, width",
           }}
         />
       )}
@@ -136,11 +145,13 @@ export function ModeTabs() {
       {MODES.map((m: Mode, i) => (
         <button
           key={m.id}
-          ref={(el) => { buttonRefs.current[i] = el; }}
+          ref={(el) => {
+            buttonRefs.current[i] = el;
+          }}
           onClick={() => changeMode(m)}
           className={cn(
             "relative z-10 flex-1 text-center mode-tab",
-            mode === m.id && "active"
+            mode === m.id && "active",
           )}
           style={{ background: "transparent", boxShadow: "none" }}
         >

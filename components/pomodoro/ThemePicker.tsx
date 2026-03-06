@@ -10,7 +10,7 @@ import {
 import { cn } from "@/lib/utils";
 import { THEMES } from "@/lib/constants";
 import { usePomodoroContext } from "@/components/pomodoro/PomodoroContext";
-import type { ThemeId } from "@/types/pomodoro";
+import type { ThemeId } from "@/types/focuskitty";
 
 export function ThemePicker() {
   const { theme, setTheme } = usePomodoroContext();
@@ -36,7 +36,7 @@ export function ThemePicker() {
                   "transition-colors duration-150 cursor-pointer border-none font-[inherit]",
                   isActive
                     ? "bg-[var(--accent-soft)]"
-                    : "bg-transparent hover:bg-[var(--progress-track)]"
+                    : "bg-transparent hover:bg-[var(--progress-track)]",
                 )}
               >
                 {/* Swatch dot */}
