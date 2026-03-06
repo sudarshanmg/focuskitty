@@ -3,6 +3,7 @@
 import { RotateCcw, Play, Pause, SkipForward } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { Tooltip, Kbd } from "@/components/ui/tooltip";
 import { usePomodoroContext } from "@/components/pomodoro/PomodoroContext";
 
 export function TimerControls() {
@@ -15,25 +16,33 @@ export function TimerControls() {
     <>
       <Separator />
       <div className="flex items-center justify-center gap-3 px-6 py-5">
-
         {/* Reset */}
-        <Button
-          variant="secondary"
-          size="icon"
-          onClick={reset}
-          aria-label="Reset timer"
+        <Tooltip
+          content={
+            <>
+              Reset <Kbd>R</Kbd>
+            </>
+          }
         >
-          <RotateCcw size={14} />
-        </Button>
+          <Button
+            variant="secondary"
+            size="icon"
+            onClick={reset}
+            aria-label="Reset timer"
+          >
+            <RotateCcw size={14} />
+          </Button>
+        </Tooltip>
 
-        {/* Primary CTA — accent bg, contrast-aware text */}
+        {/* Primary CTA */}
         <Button
           onClick={toggle}
           className="min-w-[136px] gap-2 font-medium"
           style={{
             background: "var(--accent)",
             color: "var(--btn-text, #ffffff)",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.12)",
+            boxShadow:
+              "0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.12)",
             fontSize: "0.92rem",
             padding: "0.72rem 2rem",
             height: "auto",
@@ -53,15 +62,22 @@ export function TimerControls() {
         </Button>
 
         {/* Skip */}
-        <Button
-          variant="secondary"
-          size="icon"
-          onClick={skip}
-          aria-label="Skip session"
+        <Tooltip
+          content={
+            <>
+              Next <Kbd>N</Kbd>
+            </>
+          }
         >
-          <SkipForward size={14} />
-        </Button>
-
+          <Button
+            variant="secondary"
+            size="icon"
+            onClick={skip}
+            aria-label="Skip session"
+          >
+            <SkipForward size={14} />
+          </Button>
+        </Tooltip>
       </div>
     </>
   );

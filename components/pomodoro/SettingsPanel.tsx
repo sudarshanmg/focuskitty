@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { X } from "lucide-react";
+import { X, Keyboard } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { usePomodoroContext } from "@/components/pomodoro/PomodoroContext";
+import { KeyboardShortcutsModal } from "@/components/pomodoro/KeyboardShortcutsModal";
 
 /* ── Small primitives ── */
 function SectionLabel({ children }: { children: React.ReactNode }) {
@@ -207,8 +208,15 @@ function GroupBox({ children }: { children: React.ReactNode }) {
 
 /* ── Main panel ── */
 export function SettingsPanel() {
-  const { showSettings, closeSettings, settings, updateSettings } =
-    usePomodoroContext();
+  const {
+    showSettings,
+    closeSettings,
+    settings,
+    updateSettings,
+    showShortcuts,
+    openShortcuts,
+    closeShortcuts,
+  } = usePomodoroContext();
   const panelRef = useRef<HTMLDivElement>(null);
 
   /* Close on Escape */
@@ -366,7 +374,36 @@ export function SettingsPanel() {
             onChecked={(v) => updateSettings({ soundEnabled: v })}
           />
         </GroupBox>
+
+        {/* Keyboard Shortcuts */}
+        <SectionLabel>General</SectionLabel>
+        <GroupBox>
+          <div className="flex items-center justify-between py-2.5">
+            <div className="flex items-center gap-2">
+              <Keyboard size={14} style={{ color: "var(--text-muted)" }} />
+              <span
+                style={{
+                  fontSize: "0.85rem",
+                  color: "var(--text-primary)",
+                  fontWeight: 500,
+                }}
+              >
+                Keyboard Shortcuts
+              </span>
+            </div>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={openShortcuts}
+              style={{ fontSize: "0.72rem", height: 28, padding: "0 10px" }}
+            >
+              View
+            </Button>
+          </div>
+        </GroupBox>
       </div>
+
+      <KeyboardShortcutsModal open={showShortcuts} onClose={closeShortcuts} />
     </>
   );
 }

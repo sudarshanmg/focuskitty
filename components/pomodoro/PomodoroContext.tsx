@@ -66,6 +66,13 @@ interface PomodoroContextValue {
   showSettings: boolean;
   openSettings: () => void;
   closeSettings: () => void;
+
+  showShortcuts: boolean;
+  openShortcuts: () => void;
+  closeShortcuts: () => void;
+
+  viewMode: "default" | "zen";
+  setViewMode: (m: "default" | "zen") => void;
 }
 
 const PomodoroContext = createContext<PomodoroContextValue | null>(null);
@@ -85,6 +92,8 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
   const [sessionsDone, setSessionsDone] = useState(0);
   const [showPaywall, setShowPaywall] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showShortcuts, setShowShortcuts] = useState(false);
+  const [viewMode, setViewMode] = useState<"default" | "zen">("default");
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
 
   // Always derived fresh from settings — never stale
@@ -93,6 +102,13 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
 
   const [secondsLeft, setSecondsLeft] = useState(currentMode.seconds);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    audioRef.current = new Audio("/sounds/chime_1.mp3");
+    audioRef.current.preload = "auto";
+  }, []);
 
   /* Apply theme */
   const setTheme = useCallback((t: ThemeId) => {
@@ -112,6 +128,12 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
           if (s <= 1) {
             clearInterval(intervalRef.current!);
             setRunning(false);
+
+            // Play chime if enabled
+            if (settings.soundEnabled && audioRef.current) {
+              audioRef.current.currentTime = 0;
+              audioRef.current.play().catch(() => {}); // ignore autoplay policy errors
+            }
 
             // Determine next mode
             const isBreak = mode !== "focus";
@@ -243,6 +265,11 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
         showSettings,
         openSettings: () => setShowSettings(true),
         closeSettings: () => setShowSettings(false),
+        showShortcuts,
+        openShortcuts: () => setShowShortcuts(true),
+        closeShortcuts: () => setShowShortcuts(false),
+        viewMode,
+        setViewMode,
       }}
     >
       {children}

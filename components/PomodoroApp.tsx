@@ -1,13 +1,16 @@
 "use client";
+
 import { PomodoroProvider } from "@/components/pomodoro/PomodoroContext";
 import { PomodoroCard } from "@/components/pomodoro/PomodoroCard";
 import { PaywallModal } from "@/components/pomodoro/PaywallModal";
 import { SettingsPanel } from "@/components/pomodoro/SettingsPanel";
+import { ZenMode } from "@/components/pomodoro/ZenMode";
 import { usePomodoroContext } from "@/components/pomodoro/PomodoroContext";
+import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 
-/* Inner wrapper so we can read context for the upgrade nudge */
 function PomodoroInner() {
   const { openPaywall } = usePomodoroContext();
+  useKeyboardShortcuts();
 
   return (
     <div
@@ -16,7 +19,6 @@ function PomodoroInner() {
     >
       <PomodoroCard />
 
-      {/* Subtle upgrade nudge below card */}
       <button
         className="animate-fade-in text-center"
         style={{
@@ -39,6 +41,7 @@ function PomodoroInner() {
 
       <PaywallModal />
       <SettingsPanel />
+      <ZenMode />
     </div>
   );
 }

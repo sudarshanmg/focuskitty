@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useRef, useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { usePomodoroContext } from "@/components/pomodoro/PomodoroContext";
 import type { Mode } from "@/types/focuskitty";
@@ -10,74 +10,81 @@ interface PillRect {
   width: number;
 }
 
+function getRect(
+  index: number,
+  buttonRefs: React.MutableRefObject<(HTMLButtonElement | null)[]>,
+  containerRef: React.MutableRefObject<HTMLDivElement | null>,
+): PillRect | null {
+  const btn = buttonRefs.current[index];
+  const container = containerRef.current;
+  if (!btn || !container) return null;
+  const cr = container.getBoundingClientRect();
+  const br = btn.getBoundingClientRect();
+  return { left: br.left - cr.left, width: br.width };
+}
+
 export function ModeTabs() {
   const { mode, changeMode, modes } = usePomodoroContext();
 
   const containerRef = useRef<HTMLDivElement>(null);
   const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const pillRef = useRef<HTMLSpanElement>(null);
+  const prevPill = useRef<PillRect>({ left: 0, width: 0 });
+  const prevModeRef = useRef<string>(mode);
+  const currentModeRef = useRef<string>(mode); // always up to date for ResizeObserver
 
   const [pill, setPill] = useState<PillRect>({ left: 0, width: 0 });
   const [ready, setReady] = useState(false);
-  const prevPill = useRef<PillRect>({ left: 0, width: 0 });
 
-  // Stable mode id list — only changes when mode labels/ids change, not on every tick
-  const modeIds = modes.map((m) => m.id).join(",");
+  // Keep currentModeRef in sync without triggering effects
+  currentModeRef.current = mode;
 
-  const measure = useCallback(
-    (modeId: string): PillRect | null => {
-      const activeIndex = buttonRefs.current.findIndex(
-        (_, i) => modes[i]?.id === modeId,
-      );
-      const btn = buttonRefs.current[activeIndex];
-      const container = containerRef.current;
-      if (!btn || !container) return null;
-      const cr = container.getBoundingClientRect();
-      const br = btn.getBoundingClientRect();
-      return { left: br.left - cr.left, width: br.width };
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    },
-    [modeIds],
-  ); // stable — only recalculates if tab count/ids change
-
-  /* Initial placement — no animation */
+  /* Initial placement — once after mount */
   useEffect(() => {
-    const rect = measure(mode);
+    const idx = modes.findIndex((m) => m.id === mode);
+    const rect = getRect(idx, buttonRefs, containerRef);
     if (!rect) return;
     setPill(rect);
     prevPill.current = rect;
+    prevModeRef.current = mode;
     setReady(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  /* Resize observer — reposition pill without animation when container resizes */
+  /* ResizeObserver — snap pill on resize only, never on mode change */
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
     const ro = new ResizeObserver(() => {
-      const rect = measure(mode);
+      const idx = modes.findIndex((m) => m.id === currentModeRef.current);
+      const rect = getRect(idx, buttonRefs, containerRef);
       if (!rect) return;
-      // Cancel any running animation and snap to new position
+      // Cancel any in-progress animation and snap
       pillRef.current?.getAnimations().forEach((a) => a.cancel());
       setPill(rect);
       prevPill.current = rect;
     });
     ro.observe(container);
     return () => ro.disconnect();
-  }, [mode, measure]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // empty deps — intentional, uses ref for current mode
 
-  /* On mode change — jelly slide */
+  /* Jelly animation — only when mode actually changes */
   useEffect(() => {
     if (!ready) return;
-    const next = measure(mode);
+    if (prevModeRef.current === mode) return;
+
+    const idx = modes.findIndex((m) => m.id === mode);
+    const next = getRect(idx, buttonRefs, containerRef);
     if (!next) return;
 
-    const prev = prevPill.current;
+    const prev = { ...prevPill.current }; // snapshot before any mutation
     const el = pillRef.current;
     if (!el) return;
 
-    // Skip animation if position hasn't changed (e.g. resize already snapped)
-    if (prev.left === next.left && prev.width === next.width) return;
+    // Update refs immediately so concurrent effects don't double-fire
+    prevModeRef.current = mode;
+    prevPill.current = next;
 
     const goingRight = next.left > prev.left;
     const stretchW = Math.abs(next.left - prev.left) * 0.6 + next.width;
@@ -122,13 +129,11 @@ export function ModeTabs() {
       },
     );
 
-    const timeout = setTimeout(() => {
-      setPill(next);
-      prevPill.current = next;
-    }, 420);
-
-    return () => clearTimeout(timeout);
-  }, [mode, ready, measure]);
+    // Sync React state after animation settles
+    const t = setTimeout(() => setPill(next), 420);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, ready]);
 
   return (
     <div

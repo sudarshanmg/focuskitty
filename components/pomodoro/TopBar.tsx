@@ -1,29 +1,17 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { Maximize2, Minimize2, Settings } from "lucide-react";
+import { Expand, Blend } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { Tooltip } from "@/components/ui/tooltip";
 import { ThemePicker } from "@/components/pomodoro/ThemePicker";
 import { usePomodoroContext } from "@/components/pomodoro/PomodoroContext";
 
 export function TopBar() {
-  const { openPaywall, openSettings } = usePomodoroContext();
-  const [isFullscreen, setIsFullscreen] = useState(false);
+  const { openPaywall, openSettings, viewMode, setViewMode } =
+    usePomodoroContext();
 
-  useEffect(() => {
-    const handler = () => setIsFullscreen(!!document.fullscreenElement);
-    document.addEventListener("fullscreenchange", handler);
-    return () => document.removeEventListener("fullscreenchange", handler);
-  }, []);
-
-  const toggleFullscreen = useCallback(async () => {
-    if (!document.fullscreenElement) {
-      await document.documentElement.requestFullscreen();
-    } else {
-      await document.exitFullscreen();
-    }
-  }, []);
+  const enterZen = () => setViewMode("zen");
 
   return (
     <>
@@ -36,25 +24,29 @@ export function TopBar() {
         </span>
 
         <div className="flex items-center gap-2">
-          {/* Fullscreen */}
-          <Button
-            variant="secondary"
-            size="icon"
-            onClick={toggleFullscreen}
-            aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
-          >
-            {isFullscreen ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
-          </Button>
+          {/* Zen mode */}
+          <Tooltip content="Zen mode">
+            <Button
+              variant="secondary"
+              size="icon"
+              onClick={enterZen}
+              aria-label="Enter zen mode"
+            >
+              <Expand size={14} />
+            </Button>
+          </Tooltip>
 
           {/* Settings */}
-          <Button
-            variant="secondary"
-            size="icon"
-            onClick={openSettings}
-            aria-label="Settings"
-          >
-            <Settings size={14} />
-          </Button>
+          <Tooltip content="Settings">
+            <Button
+              variant="secondary"
+              size="icon"
+              onClick={openSettings}
+              aria-label="Settings"
+            >
+              <Blend size={14} />
+            </Button>
+          </Tooltip>
 
           {/* Theme picker */}
           <ThemePicker />
